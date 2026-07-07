@@ -1,0 +1,17 @@
+# IDE
+.idea/
+*.iml
+
+# Build
+target/
+*.class
+*.jar
+*.war
+
+# Logs
+log.path_IS_UNDEFINED/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
