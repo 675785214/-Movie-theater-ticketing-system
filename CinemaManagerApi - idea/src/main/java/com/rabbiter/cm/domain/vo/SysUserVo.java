@@ -11,6 +11,10 @@ public class SysUserVo implements Serializable {
 
     private String password;
 
+    private String captchaKey;
+
+    private String captchaCode;
+
     public SysUserVo() {
     }
 
@@ -35,11 +39,29 @@ public class SysUserVo implements Serializable {
         this.password = password;
     }
 
+    public String getCaptchaKey() {
+        return captchaKey;
+    }
+
+    public void setCaptchaKey(String captchaKey) {
+        this.captchaKey = captchaKey;
+    }
+
+    public String getCaptchaCode() {
+        return captchaCode;
+    }
+
+    public void setCaptchaCode(String captchaCode) {
+        this.captchaCode = captchaCode;
+    }
+
     @Override
     public String toString() {
         return "SysUserVo{" +
                 "userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
+                ", captchaKey='" + captchaKey + '\'' +
+                ", captchaCode='" + captchaCode + '\'' +
                 '}';
     }
 }

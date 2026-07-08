@@ -52,6 +52,32 @@
                         </el-col>
                     </el-row>
                 </el-form-item>
+                <!-- 验证码 -->
+                <el-form-item prop="captchaCode">
+                    <el-row>
+                        <el-col :span="2">
+                            <i
+                                class="iconfont icon-r-lock"
+                                style="font-size: 28px; color: grey"
+                            ></i>
+                        </el-col>
+                        <el-col :span="14">
+                            <el-input
+                                v-model="loginForm.captchaCode"
+                                placeholder="请输入验证码"
+                                clearable
+                            ></el-input>
+                        </el-col>
+                        <el-col :span="8">
+                            <img
+                                :src="captchaImage"
+                                @click="refreshCaptcha"
+                                class="captcha-img"
+                                alt="验证码"
+                            />
+                        </el-col>
+                    </el-row>
+                </el-form-item>
                 <!-- 按扭区域 -->
                 <el-form-item class="btns">
                     <el-button :round="true" type="primary" @click="login" style="font-size: 20px">
@@ -84,14 +110,14 @@ export default {
     name: "Login",
     data() {
         return {
-            // 登录表单数据对象
             loginForm: {
                 userName: "",
                 password: "",
+                captchaKey: "",
+                captchaCode: "",
             },
-            // 登录表单验证规则
+            captchaImage: "",
             loginFormRules: {
-                // 验证用户名格式
                 userName: [
                     {
                         required: true,
@@ -105,13 +131,21 @@ export default {
                         trigger: "blur",
                     },
                 ],
-                // 验证密码格式
                 password: [
                     { required: true, message: "请输入密码", trigger: "blur" },
                     {
                         min: 6,
                         max: 16,
                         message: "登录密码长度在6到16个字符之间",
+                        trigger: "blur",
+                    },
+                ],
+                captchaCode: [
+                    { required: true, message: "请输入验证码", trigger: "blur" },
+                    {
+                        min: 4,
+                        max: 4,
+                        message: "验证码长度为4个字符",
                         trigger: "blur",
                     },
                 ],
@@ -123,41 +157,60 @@ export default {
         this.sessionId = window.sessionStorage.getItem("sessionId");
         console.log("this sessionId is : " + this.sessionId);
         window.sessionStorage.setItem("sessionId", 0);
+        this.refreshCaptcha();
     },
     methods: {
         success(params) {
             this.login();
+        },
+        async refreshCaptcha() {
+            const resData = await axios.get("captcha");
+            if (resData && resData.data && resData.data.code === 200) {
+                this.loginForm.captchaKey = resData.data.data.captchaKey;
+                this.captchaImage = resData.data.data.captchaImage;
+            }
         },
         login() {
             this.$refs.loginFormRef.validate(async (valid) => {
                 if (!valid) return;
                 axios.defaults.headers.post["Content-Type"] =
                     "application/json";
-                const { data: res } = await axios.post(
-                    "sysUser/login",
-                    JSON.stringify(this.loginForm)
-                );
-                if (res.code !== 200) return this.$message.error(res.msg);
+                try {
+                    const { data: res } = await axios.post(
+                        "sysUser/login",
+                        JSON.stringify(this.loginForm)
+                    );
+                    if (res.code !== 200) {
+                        this.refreshCaptcha();
+                        return this.$message.error(res.msg);
+                    }
 
-                this.$message.success({ message: "登录成功", duration: 1000 });
-                console.log(res.data);
-                // 保存token
-                window.sessionStorage.setItem("token", res.data.token);
-                res.data.sysUser.sysRole = null;
-                window.sessionStorage.setItem(
-                    "loginUser",
-                    JSON.stringify(res.data.sysUser)
-                );
-                if (
-                    this.sessionId !== 0 &&
-                    this.sessionId !== "0" &&
-                    this.sessionId !== null
-                ) {
-                    this.$router.push("/chooseSeat/" + this.sessionId);
-                    return;
+                    this.$message.success({ message: "登录成功", duration: 1000 });
+                    console.log(res.data);
+                    window.sessionStorage.setItem("token", res.data.token);
+                    res.data.sysUser.sysRole = null;
+                    window.sessionStorage.setItem(
+                        "loginUser",
+                        JSON.stringify(res.data.sysUser)
+                    );
+                    if (
+                        this.sessionId !== 0 &&
+                        this.sessionId !== "0" &&
+                        this.sessionId !== null
+                    ) {
+                        this.$router.push("/chooseSeat/" + this.sessionId);
+                        return;
+                    }
+                    this.$router.push("/welcome");
+                } catch (e) {
+                    this.refreshCaptcha();
+                    console.log(e);
+                    if (e.response && e.response.data) {
+                        this.$message.error(e.response.data);
+                    } else {
+                        this.$message.error("网络错误");
+                    }
                 }
-                // 导航跳转到首页
-                this.$router.push("/welcome");
             });
         },
         registerAccount() {
@@ -176,7 +229,7 @@ export default {
 
 .login_box {
     width: 450px;
-    height: 300px;
+    height: 380px;
     background-color: #fff;
     border-radius: 3px;
     position: absolute;
@@ -222,5 +275,12 @@ export default {
 .btns {
     display: flex;
     justify-content: center;
+}
+
+.captcha-img {
+    width: 100%;
+    height: 38px;
+    cursor: pointer;
+    border-radius: 4px;
 }
 </style>

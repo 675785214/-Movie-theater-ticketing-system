@@ -34,6 +34,8 @@ public class ShiroConfig {
         // 放行注册和登录
         map.put("/sysUser/register", "anon");
         map.put("/sysUser/login", "anon");
+        // 放行验证码接口
+        map.put("/captcha", "anon");
         // 放行图片查询
         map.put("/images/**", "anon");
         // 请求这个资源需要认证与授权

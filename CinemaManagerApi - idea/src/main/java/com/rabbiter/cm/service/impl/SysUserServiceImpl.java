@@ -1,5 +1,6 @@
 package com.rabbiter.cm.service.impl;
 
+import com.rabbiter.cm.common.utils.CaptchaUtil;
 import com.rabbiter.cm.common.utils.JwtUtil;
 import com.rabbiter.cm.common.utils.SaltUtils;
 import com.rabbiter.cm.domain.LoginUser;
@@ -89,22 +90,22 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     public LoginUser login(SysUserVo sysUserVo) {
-        //登录，先查询用户信息
+        if (!CaptchaUtil.validate(sysUserVo.getCaptchaKey(), sysUserVo.getCaptchaCode())) {
+            throw new AuthenticationException("验证码错误或已过期");
+        }
+
         SysUser user = sysUserMapper.findUserByName(sysUserVo.getUserName());
         if (user == null) {
             throw new AuthenticationException("用户名不存在");
         }
 
-        //验证密码
         Md5Hash md5Hash = new Md5Hash(sysUserVo.getPassword(), user.getSalt(), 1024);
         if (!user.getPassword().equals(md5Hash.toHex())) {
             throw new AuthenticationException("用户名或密码错误");
         }
 
-        //设置登录用户对象
         LoginUser loginUser = findLoginUser(sysUserVo);
 
-        //颁发token
         String token = JwtUtil.sign(user.getUserName(), user.getPassword());
         loginUser.setToken(token);
         return loginUser;

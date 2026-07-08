@@ -49,6 +49,30 @@
                         ></el-input>
                     </el-col>
                 </el-form-item>
+                <!-- 验证码 -->
+                <el-form-item prop="captchaCode">
+                    <el-col :span="2">
+                        <i
+                            class="iconfont icon-r-lock"
+                            style="font-size: 28px; color: grey"
+                        ></i>
+                    </el-col>
+                    <el-col :span="14">
+                        <el-input
+                            v-model="loginForm.captchaCode"
+                            placeholder="请输入验证码"
+                            clearable
+                        ></el-input>
+                    </el-col>
+                    <el-col :span="8">
+                        <img
+                            :src="captchaImage"
+                            @click="refreshCaptcha"
+                            class="captcha-img"
+                            alt="验证码"
+                        />
+                    </el-col>
+                </el-form-item>
                 <!-- 按扭区域 -->
                 <el-form-item class="btns">
                     <el-button
@@ -74,14 +98,14 @@ export default {
     name: "Login",
     data() {
         return {
-            //登录表单数据对象
             loginForm: {
                 userName: "",
                 password: "",
+                captchaKey: "",
+                captchaCode: "",
             },
-            //表单验证规则
+            captchaImage: "",
             loginFormRules: {
-                //验证用户名
                 userName: [
                     {
                         required: true,
@@ -95,7 +119,6 @@ export default {
                         trigger: "blur",
                     },
                 ],
-                //验证密码
                 password: [
                     { required: true, message: "请输入密码", trigger: "blur" },
                     {
@@ -105,12 +128,31 @@ export default {
                         trigger: "blur",
                     },
                 ],
+                captchaCode: [
+                    { required: true, message: "请输入验证码", trigger: "blur" },
+                    {
+                        min: 4,
+                        max: 4,
+                        message: "验证码长度为4个字符",
+                        trigger: "blur",
+                    },
+                ],
             },
         };
+    },
+    created() {
+        this.refreshCaptcha();
     },
     methods: {
         success(params) {
             this.login();
+        },
+        async refreshCaptcha() {
+            const resData = await axios.get("captcha");
+            if (resData && resData.data && resData.data.code === 200) {
+                this.loginForm.captchaKey = resData.data.data.captchaKey;
+                this.captchaImage = resData.data.data.captchaImage;
+            }
         },
         login() {
             this.$refs.loginFormRef.validate(async (valid) => {
@@ -121,6 +163,7 @@ export default {
                     .post("sysUser/login", JSON.stringify(this.loginForm))
                     .catch((e) => {
                         console.log(e);
+                        this.refreshCaptcha();
                         if (
                             e.response == undefined ||
                             e.response.data == undefined
@@ -141,6 +184,7 @@ export default {
                         }
                     });
                 if (resData == undefined) {
+                    this.refreshCaptcha();
                     this.$message({
                         showClose: true,
                         message: "Network Error",
@@ -150,8 +194,10 @@ export default {
                     return;
                 }
                 const { data: res } = resData;
-                if (res.code !== 200) return this.$message.error(res.msg);
-                //控制登录权限
+                if (res.code !== 200) {
+                    this.refreshCaptcha();
+                    return this.$message.error(res.msg);
+                }
                 if (
                     res.data.sysUser.sysRole.children === null ||
                     res.data.sysUser.sysRole.children[0] === null
@@ -195,7 +241,7 @@ export default {
 .login_box {
     opacity: 0.8;
     width: 450px;
-    height: 300px;
+    height: 380px;
     background-color: #fff;
     border-radius: 3px;
     position: absolute;
@@ -241,5 +287,12 @@ export default {
 .btns {
     display: flex;
     justify-content: center;
+}
+
+.captcha-img {
+    width: 100%;
+    height: 38px;
+    cursor: pointer;
+    border-radius: 4px;
 }
 </style>
