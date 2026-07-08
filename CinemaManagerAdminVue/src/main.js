@@ -20,7 +20,7 @@ import global_variable from "@/components/global_variable";
 
 Vue.prototype.global = global_variable
 
-axios.defaults.baseURL = 'http://127.0.0.1:9231/'
+axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || '/'
 axios.interceptors.request.use(config => {
   config.headers.Token = window.sessionStorage.getItem('token')
   return config

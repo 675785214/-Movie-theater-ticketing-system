@@ -5,7 +5,18 @@
  */
 module.exports = {
     devServer: {
-        port: 9233
+        port: 9233,
+        proxy: {
+            '/api': {
+                target: 'http://127.0.0.1:9231',
+                changeOrigin: true,
+                pathRewrite: { '^/api': '' }
+            },
+            '/images': {
+                target: 'http://127.0.0.1:9231',
+                changeOrigin: true
+            }
+        }
     },
-    publicPath:process.env.NODE_ENV === 'production' ? '/电影院后台管理' : '/'
+    publicPath: process.env.NODE_ENV === 'production' ? '/admin' : '/'
 }

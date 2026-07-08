@@ -599,7 +599,7 @@ export default {
       console.log(err)
     },
     toMovieInfo(id) {
-      window.open('http://localhost:9232/movieInfo/' + id)
+      window.open(process.env.VUE_APP_USER_FRONTEND_URL + '/movieInfo/' + id)
     },
     isAbleEdit(id) {
       this.checkAbleId.movieId = id

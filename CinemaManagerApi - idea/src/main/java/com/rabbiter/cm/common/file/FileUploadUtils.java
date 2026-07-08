@@ -30,9 +30,9 @@ public class FileUploadUtils {
     public static final int DEFAULT_FILE_NAME_LENGTH = 100;
 
     /**
-     * 默认存储图片目录
+     * 默认存储图片目录（懒加载，优先使用环境变量 APP_UPLOAD_PATH）
      */
-    private static final String parentPath = PathUtils.getClassLoadRootPath() + "/images";
+    private static String parentPath = null;
 
     public static final String actorPath = "/actor";
     public static final String cinemaPath = "/cinema";
@@ -53,7 +53,19 @@ public class FileUploadUtils {
         return defaultBaseDir;
     }
 
+    /**
+     * 获取图片存储根路径，优先使用环境变量 APP_UPLOAD_PATH（Docker 容器中使用），
+     * 否则回退到 classpath 同级路径（本地开发使用）
+     */
     public static String getParentPath() {
+        if (parentPath == null) {
+            String uploadPath = System.getenv("APP_UPLOAD_PATH");
+            if (uploadPath != null && !uploadPath.isEmpty()) {
+                parentPath = uploadPath + "/images";
+            } else {
+                parentPath = PathUtils.getClassLoadRootPath() + "/images";
+            }
+        }
         return parentPath;
     }
 

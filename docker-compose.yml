@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: cinema-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请设置数据库密码}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-cinema_manager}
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - cinema-net
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --default-time-zone=+08:00
+
+  backend:
+    build:
+      context: "CinemaManagerApi - idea"
+      dockerfile: ../Dockerfile.backend
+    container_name: cinema-backend
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_DRUID_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-cinema_manager}?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_DRUID_USERNAME: root
+      SPRING_DATASOURCE_DRUID_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      APP_UPLOAD_PATH: /app/images
+      TZ: Asia/Shanghai
+    ports:
+      - "${BACKEND_PORT:-9231}:9231"
+    volumes:
+      - backend-images:/app/images
+    networks:
+      - cinema-net
+
+  admin-frontend:
+    build:
+      context: ./CinemaManagerAdminVue
+      dockerfile: ../Dockerfile.admin
+    container_name: cinema-admin
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${ADMIN_PORT:-9233}:80"
+    networks:
+      - cinema-net
+
+  user-frontend:
+    build:
+      context: ./CinemaManagerUserVue
+      dockerfile: ../Dockerfile.user
+    container_name: cinema-user
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${USER_PORT:-9232}:80"
+    networks:
+      - cinema-net
+
+volumes:
+  mysql-data:
+  backend-images:
+
+networks:
+  cinema-net:
+    driver: bridge

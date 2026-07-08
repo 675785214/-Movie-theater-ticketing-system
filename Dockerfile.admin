@@ -1,0 +1,36 @@
+# ========== 多阶段构建：管理端前端 ==========
+
+# ---------- 阶段一：Node 编译 ----------
+FROM node:18.20-alpine AS build
+
+WORKDIR /app
+
+# 设置 npm 淘宝镜像
+RUN npm config set registry https://registry.npmmirror.com
+
+# 安装 yarn
+RUN npm install -g yarn
+
+# 先拷贝依赖文件，利用 Docker 层缓存
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# 拷贝源码
+COPY . .
+
+# 设置环境变量以支持 OpenSSL 3.0（Node 17+ 需要）
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
+# 生产构建
+RUN yarn build
+
+# ---------- 阶段二：Nginx 服务 ----------
+FROM nginx:1.25-alpine
+
+# 拷贝构建产物到 Nginx
+COPY --from=build /app/dist /usr/share/nginx/html/admin
+
+# 拷贝 Nginx 配置
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80

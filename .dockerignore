@@ -1,0 +1,11 @@
+# Docker 构建忽略文件
+
+**/node_modules/
+**/target/
+**/.git/
+**/.idea/
+**/*.log
+**/dist/
+**/log.path_IS_UNDEFINED/
+**/Thumbs.db
+**/.DS_Store

@@ -1,0 +1,34 @@
+# ========== 多阶段构建：后端 API ==========
+
+# ---------- 阶段一：Maven 编译 ----------
+FROM maven:3.8.8-openjdk-8-slim AS build
+
+WORKDIR /build
+
+# 设置 Maven 阿里云镜像加速（复用 pom.xml 中已有的配置）
+# 先拷贝 pom.xml，利用 Docker 层缓存下载依赖
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# 拷贝源码并编译
+COPY src ./src
+RUN mvn package -DskipTests -B
+
+# ---------- 阶段二：JRE 运行 ----------
+FROM openjdk:8-jre-slim
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /app
+
+# 从构建阶段拷贝 JAR
+COPY --from=build /build/target/CinemaManagerApi.jar /app/CinemaManagerApi.jar
+
+# 创建图片上传目录
+RUN mkdir -p /app/images && chmod 777 /app/images
+
+EXPOSE 9231
+
+ENTRYPOINT ["java", "-jar", "/app/CinemaManagerApi.jar"]

@@ -22,3 +22,10 @@ log.path_IS_UNDEFINED/
 # ==================== OS ====================
 .DS_Store
 Thumbs.db
+
+# ==================== Docker ====================
+.env
+docker-compose.override.yml
+
+# ==================== Uploads (local) ====================
+images/
