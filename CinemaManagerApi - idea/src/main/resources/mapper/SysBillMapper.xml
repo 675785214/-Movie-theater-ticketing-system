@@ -12,6 +12,44 @@
         <association property="sysUser" column="user_id" select="com.rabbiter.cm.mapper.SysUserMapper.findUserById"></association>
     </resultMap>
 
+    <!-- 优化版：JOIN 查询，一条 SQL 替代 N+1 次子查询 -->
+    <resultMap id="BillJoinMap" type="SysBill">
+        <id property="billId" column="bill_id"></id>
+        <result property="userId" column="user_id"></result>
+        <result property="sessionId" column="session_id"></result>
+        <result property="payState" column="pay_state"></result>
+        <result property="cancelState" column="cancel_state"></result>
+        <result property="seats" column="seats"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="deadline" column="deadline"></result>
+        <result property="cancelTime" column="cancel_time"></result>
+        <association property="sysSession" javaType="SysSession">
+            <id property="sessionId" column="session_id"></id>
+            <result property="hallId" column="hall_id"></result>
+            <result property="movieId" column="movie_id"></result>
+            <result property="sessionDate" column="session_date"></result>
+            <result property="sessionPrice" column="session_price"></result>
+            <result property="sessionSeats" column="session_seats"></result>
+            <result property="sessionTips" column="session_tips"></result>
+            <association property="sysHall" javaType="SysHall">
+                <id property="hallId" column="hall_id"></id>
+                <result property="hallName" column="hall_name"></result>
+                <result property="hallCategory" column="hall_category"></result>
+            </association>
+            <association property="sysMovie" javaType="SysMovie">
+                <id property="movieId" column="movie_id"></id>
+                <result property="movieName" column="movie_name"></result>
+                <result property="movieLength" column="movie_length"></result>
+            </association>
+        </association>
+        <association property="sysUser" javaType="SysUser">
+            <id property="userId" column="user_id"></id>
+            <result property="userName" column="user_name"></result>
+            <result property="email" column="email"></result>
+            <result property="phoneNumber" column="phone_number"></result>
+        </association>
+    </resultMap>
+
     <select id="findAllBills" parameterType="SysBill" resultMap="BillMap">
         select * from sys_bill
         <where>
@@ -27,6 +65,31 @@
             <if test="createTime != null"> and create_time &gt;= #{createTime} and create_time &lt;= adddate(#{createTime}, 1) </if>
         </where>
         order by bill_id desc
+    </select>
+
+    <!-- 优化版：一次性 JOIN 查询订单+场次+影厅+电影+用户，消除 N+1 -->
+    <select id="findAllBillsJoin" parameterType="SysBill" resultMap="BillJoinMap">
+        SELECT b.*,
+               s.hall_id, s.movie_id, s.session_date, s.session_price,
+               s.session_seats, s.session_tips,
+               h.hall_name, h.hall_category,
+               m.movie_name, m.movie_length,
+               u.user_name, u.email, u.phone_number
+        FROM sys_bill b
+        JOIN sys_session s ON b.session_id = s.session_id
+        JOIN sys_hall h ON s.hall_id = h.hall_id
+        JOIN sys_movie m ON s.movie_id = m.movie_id
+        JOIN sys_user u ON b.user_id = u.user_id
+        <where>
+            <if test="payState != null"> and b.pay_state = #{payState} </if>
+            <if test="sessionId != null and sessionId !=''"> and b.session_id = #{sessionId} </if>
+            <if test="queryByUserName != null and queryByUserName != ''">
+                and u.user_name like concat('%', #{queryByUserName}, '%')
+            </if>
+            <if test="userId != null"> and b.user_id = #{userId} </if>
+            <if test="createTime != null"> and b.create_time &gt;= #{createTime} and b.create_time &lt;= adddate(#{createTime}, 1) </if>
+        </where>
+        order by b.bill_id desc
     </select>
 
     <select id="findBillById" parameterType="long" resultMap="BillMap">

@@ -18,7 +18,7 @@ public class SysSessionServiceImpl implements SysSessionService {
 
     @Override
     public List<SysSession> findByVo(SysSessionVo sysSessionVo) {
-        return sysSessionMapper.findByVo(sysSessionVo);
+        return sysSessionMapper.findByVoJoin(sysSessionVo);
     }
 
     @Override

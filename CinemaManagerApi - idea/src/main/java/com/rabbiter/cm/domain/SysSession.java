@@ -7,6 +7,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 /**
@@ -32,13 +34,14 @@ public class SysSession implements Serializable {
     private Long movieId;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "HH:mm")
-    private String playTime;
+    private LocalTime playTime;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "HH:mm")
-    private String endTime;
+    private LocalTime endTime;
 
     // 截止时间，此时间之前不可删不可改电影、影厅信息
-    private String deadline;
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime deadline;
 
     // 场次日期
     @NotNull(message = "场次日期不能为空")
@@ -69,7 +72,7 @@ public class SysSession implements Serializable {
     public SysSession() {
     }
 
-    public SysSession(Long sessionId, Long hallId, String languageVersion, Long movieId, String playTime, String endTime, String deadline, LocalDate sessionDate, Double sessionPrice, String sessionTips, String sessionSeats, Integer seatNums, Integer sallNums, SysHall sysHall, SysMovie sysMovie) {
+    public SysSession(Long sessionId, Long hallId, String languageVersion, Long movieId, LocalTime playTime, LocalTime endTime, LocalDateTime deadline, LocalDate sessionDate, Double sessionPrice, String sessionTips, String sessionSeats, Integer seatNums, Integer sallNums, SysHall sysHall, SysMovie sysMovie) {
         this.sessionId = sessionId;
         this.hallId = hallId;
         this.languageVersion = languageVersion;
@@ -119,27 +122,27 @@ public class SysSession implements Serializable {
         this.movieId = movieId;
     }
 
-    public String getPlayTime() {
+    public LocalTime getPlayTime() {
         return playTime;
     }
 
-    public void setPlayTime(String playTime) {
+    public void setPlayTime(LocalTime playTime) {
         this.playTime = playTime;
     }
 
-    public String getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
-    public String getDeadline() {
+    public LocalDateTime getDeadline() {
         return deadline;
     }
 
-    public void setDeadline(String deadline) {
+    public void setDeadline(LocalDateTime deadline) {
         this.deadline = deadline;
     }
 
@@ -227,9 +230,9 @@ public class SysSession implements Serializable {
                 ", hallId=" + hallId +
                 ", languageVersion='" + languageVersion + '\'' +
                 ", movieId=" + movieId +
-                ", playTime='" + playTime + '\'' +
-                ", endTime='" + endTime + '\'' +
-                ", deadline='" + deadline + '\'' +
+                ", playTime=" + playTime +
+                ", endTime=" + endTime +
+                ", deadline=" + deadline +
                 ", sessionDate=" + sessionDate +
                 ", sessionPrice=" + sessionPrice +
                 ", sessionTips='" + sessionTips + '\'' +

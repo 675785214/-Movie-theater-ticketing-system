@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,10 +25,10 @@ public class SysCinema implements Serializable {
     private String cinemaPhone;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "HH:mm")
-    private String workStartTime;
+    private LocalTime workStartTime;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "HH:mm")
-    private String workEndTime;
+    private LocalTime workEndTime;
 
     //当前影院上映的所有电影，规则：上映的电影指包括今天在内，未来5天有安排目标影片的场次
     private List<SysMovie> sysMovieList;
@@ -35,7 +36,7 @@ public class SysCinema implements Serializable {
     public SysCinema() {
     }
 
-    public SysCinema(Long cinemaId, String cinemaName, String hallCategoryList, String cinemaPicture, String cinemaAddress, String cinemaPhone, String workStartTime, String workEndTime, List<SysMovie> sysMovieList) {
+    public SysCinema(Long cinemaId, String cinemaName, String hallCategoryList, String cinemaPicture, String cinemaAddress, String cinemaPhone, LocalTime workStartTime, LocalTime workEndTime, List<SysMovie> sysMovieList) {
         this.cinemaId = cinemaId;
         this.cinemaName = cinemaName;
         this.hallCategoryList = hallCategoryList;
@@ -95,19 +96,19 @@ public class SysCinema implements Serializable {
         this.cinemaPhone = cinemaPhone;
     }
 
-    public String getWorkStartTime() {
+    public LocalTime getWorkStartTime() {
         return workStartTime;
     }
 
-    public void setWorkStartTime(String workStartTime) {
+    public void setWorkStartTime(LocalTime workStartTime) {
         this.workStartTime = workStartTime;
     }
 
-    public String getWorkEndTime() {
+    public LocalTime getWorkEndTime() {
         return workEndTime;
     }
 
-    public void setWorkEndTime(String workEndTime) {
+    public void setWorkEndTime(LocalTime workEndTime) {
         this.workEndTime = workEndTime;
     }
 
@@ -141,8 +142,8 @@ public class SysCinema implements Serializable {
                 ", cinemaPicture='" + cinemaPicture + '\'' +
                 ", cinemaAddress='" + cinemaAddress + '\'' +
                 ", cinemaPhone='" + cinemaPhone + '\'' +
-                ", workStartTime='" + workStartTime + '\'' +
-                ", workEndTime='" + workEndTime + '\'' +
+                ", workStartTime=" + workStartTime +
+                ", workEndTime=" + workEndTime +
                 ", sysMovieList=" + sysMovieList +
                 '}';
     }

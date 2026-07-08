@@ -17,7 +17,7 @@ public class SysBillServiceImpl implements SysBillService {
 
     @Override
     public List<SysBill> findAllBills(SysBill sysBill) {
-        return sysBillMapper.findAllBills(sysBill);
+        return sysBillMapper.findAllBillsJoin(sysBill);
     }
 
     @Override

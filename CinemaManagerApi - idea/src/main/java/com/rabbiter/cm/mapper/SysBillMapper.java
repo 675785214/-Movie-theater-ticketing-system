@@ -10,6 +10,9 @@ public interface SysBillMapper {
 
     List<SysBill> findAllBills(SysBill sysBill);
 
+    /** 优化版：JOIN查询，消除N+1 */
+    List<SysBill> findAllBillsJoin(SysBill sysBill);
+
     SysBill findBillById(Long id);
 
     int addBill(SysBill sysBill);

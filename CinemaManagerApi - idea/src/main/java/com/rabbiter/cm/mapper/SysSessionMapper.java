@@ -17,6 +17,9 @@ public interface SysSessionMapper {
      */
     List<SysSession> findByVo(SysSessionVo sysSessionVo);
 
+    /** 优化版：JOIN查询场次+影厅，消除N+1 */
+    List<SysSession> findByVoJoin(SysSessionVo sysSessionVo);
+
     /**
      * 查询一个
      *
