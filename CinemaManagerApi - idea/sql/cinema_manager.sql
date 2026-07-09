@@ -1,18 +1,3 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server         : MySQL
- Source Server Type    : MySQL
- Source Server Version : 50743
- Source Host           : localhost:3306
- Source Schema         : cinema_manager
-
- Target Server Type    : MySQL
- Target Server Version : 50743
- File Encoding         : 65001
-
- Date: 25/12/2023 22:05:36
-*/
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -37,7 +22,7 @@ CREATE TABLE `sys_bill`  (
 -- ----------------------------
 -- Records of sys_bill
 -- ----------------------------
-INSERT INTO `sys_bill` VALUES (81, 1, 0, 2, 59, '[\"1排4座\",\"1排7座\",\"1排6座\",\"1排5座\"]', '2023-12-25 20:45:52', '2023-12-25 21:00:38', NULL);
+INSERT INTO `sys_bill` VALUES (81, 1, 0, 2, 59, '[\"1排4座\",\"1排7座\",\"1排6座\",\"1排5座\"]', '2026-12-25 20:45:52', '2026-12-25 21:00:38', NULL);
 INSERT INTO `sys_bill` VALUES (82, 1, 0, 2, 60, '[\"10排3座\",\"10排4座\",\"10排5座\",\"10排6座\",\"10排7座\"]', '2023-12-25 20:53:29', '2023-12-25 21:08:27', NULL);
 INSERT INTO `sys_bill` VALUES (83, 1, 0, 2, 59, '[\"2排5座\",\"2排6座\"]', '2023-12-25 21:50:44', '2023-12-25 22:05:33', NULL);
 
