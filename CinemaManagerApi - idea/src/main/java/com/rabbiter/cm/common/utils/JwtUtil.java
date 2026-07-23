@@ -71,19 +71,33 @@ public class JwtUtil {
     }
 
     /**
+     * 从token中获取用户ID
+     */
+    public static Long getUserId(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            return jwt.getClaim("userId").asLong();
+        } catch (JWTDecodeException e) {
+            return null;
+        }
+    }
+
+    /**
      * 生成token签名EXPIRE_TIME 分钟后过期
      *
      * @param username 用户名
+     * @param userId   用户ID
      * @param roleId   用户角色ID
      * @param secret   用户的密码
      * @return 加密的token
      */
-    public static String sign(String username, Long roleId, String secret) {
+    public static String sign(String username, Long userId, Long roleId, String secret) {
         Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
         Algorithm algorithm = Algorithm.HMAC256(secret);
-        // 附带username和roleId信息
+        // 附带username、userId和roleId信息
         return JWT.create()
                 .withClaim("username", username)
+                .withClaim("userId", userId)
                 .withClaim("roleId", roleId)
                 .withExpiresAt(date)
                 .sign(algorithm);
@@ -94,7 +108,7 @@ public class JwtUtil {
         /**
          * 测试生成一个token
          */
-        String sign = sign("周八", 1L, "f93643c0eacc54a5ee1783744466ab9e");
+        String sign = sign("周八", 1L, 1L, "f93643c0eacc54a5ee1783744466ab9e");
         log.warn("测试生成一个token\n" + sign);
     }
 

@@ -37,9 +37,7 @@
       </el-form>
     </div>
     <div class="footer-mini"></div>
-    <div class="footer">
-      Copyright©忧伤大白兔
-    </div>
+    <div class="footer"></div>
   </div>
 </template>
 

@@ -12,7 +12,7 @@
         <association property="sysUser" column="user_id" select="com.rabbiter.cm.mapper.SysUserMapper.findUserById"></association>
     </resultMap>
 
-    <!-- 优化版：JOIN 查询，一条 SQL 替代 N+1 次子查询 -->
+    <!-- 优化版：JOIN 查询，一条 SQL 替代 N+1 次子查询（含影院） -->
     <resultMap id="BillJoinMap" type="SysBill">
         <id property="billId" column="bill_id"></id>
         <result property="userId" column="user_id"></result>
@@ -29,17 +29,25 @@
             <result property="movieId" column="movie_id"></result>
             <result property="sessionDate" column="session_date"></result>
             <result property="sessionPrice" column="session_price"></result>
+            <result property="playTime" column="play_time"></result>
+            <result property="endTime" column="end_time"></result>
             <result property="sessionSeats" column="session_seats"></result>
             <result property="sessionTips" column="session_tips"></result>
             <association property="sysHall" javaType="SysHall">
                 <id property="hallId" column="hall_id"></id>
                 <result property="hallName" column="hall_name"></result>
                 <result property="hallCategory" column="hall_category"></result>
+                <result property="cinemaId" column="cinema_id"></result>
+                <association property="sysCinema" javaType="SysCinema">
+                    <id property="cinemaId" column="cinema_id"></id>
+                    <result property="cinemaName" column="cinema_name"></result>
+                </association>
             </association>
             <association property="sysMovie" javaType="SysMovie">
                 <id property="movieId" column="movie_id"></id>
                 <result property="movieName" column="movie_name"></result>
                 <result property="movieLength" column="movie_length"></result>
+                <result property="moviePoster" column="movie_poster"></result>
             </association>
         </association>
         <association property="sysUser" javaType="SysUser">
@@ -67,18 +75,21 @@
         order by bill_id desc
     </select>
 
-    <!-- 优化版：一次性 JOIN 查询订单+场次+影厅+电影+用户，消除 N+1 -->
+    <!-- 优化版：一次性 JOIN 查询订单+场次+影厅+电影+影院+用户，消除 N+1 -->
     <select id="findAllBillsJoin" parameterType="SysBill" resultMap="BillJoinMap">
         SELECT b.*,
                s.hall_id, s.movie_id, s.session_date, s.session_price,
+               s.play_time, s.end_time,
                s.session_seats, s.session_tips,
-               h.hall_name, h.hall_category,
-               m.movie_name, m.movie_length,
+               h.hall_name, h.hall_category, h.cinema_id,
+               m.movie_name, m.movie_length, m.movie_poster,
+               c.cinema_name,
                u.user_name, u.email, u.phone_number
         FROM sys_bill b
         JOIN sys_session s ON b.session_id = s.session_id
         JOIN sys_hall h ON s.hall_id = h.hall_id
         JOIN sys_movie m ON s.movie_id = m.movie_id
+        JOIN sys_cinema c ON h.cinema_id = c.cinema_id
         JOIN sys_user u ON b.user_id = u.user_id
         <where>
             <if test="payState != null"> and b.pay_state = #{payState} </if>

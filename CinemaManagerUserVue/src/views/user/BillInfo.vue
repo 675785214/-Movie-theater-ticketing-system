@@ -4,7 +4,7 @@
             <i class="iconfont icon-r-shield" style="font-size: 28px"></i>
             我的订单
         </div>
-        <div class="order-box" v-for="item in billList" :key="item.id">
+        <div class="order-box" v-for="item in billList" :key="item.billId">
             <div class="order-header">
                 <i
                     class="iconfont icon-r-right"
@@ -110,9 +110,14 @@ export default {
     },
     methods: {
         getUser() {
-            this.queryInfo.userId = JSON.parse(
-                window.sessionStorage.getItem("loginUser")
-            ).userId;
+            const loginUser = window.sessionStorage.getItem("loginUser");
+            if (loginUser) {
+                try {
+                    this.queryInfo.userId = JSON.parse(loginUser).userId;
+                } catch (e) {
+                    console.error("解析登录用户信息失败", e);
+                }
+            }
         },
         async getBillList() {
             const _this = this;
@@ -126,11 +131,14 @@ export default {
                 this.billList[idx].sysSession.sessionDate = moment(
                     this.billList[idx].sysSession.sessionDate
                 ).format("YYYY年MM月DD日");
-                this.billList[idx].sysSession.sysMovie.moviePoster =
-                    this.global.base +
-                    JSON.parse(
-                        this.billList[idx].sysSession.sysMovie.moviePoster
-                    )[0];
+                const poster = this.billList[idx].sysSession.sysMovie.moviePoster;
+                if (poster) {
+                    const posterArr = JSON.parse(poster);
+                    if (posterArr && posterArr.length > 0) {
+                        this.billList[idx].sysSession.sysMovie.moviePoster =
+                            this.global.base + posterArr[0];
+                    }
+                }
             }
         },
         toBillDetail(id) {

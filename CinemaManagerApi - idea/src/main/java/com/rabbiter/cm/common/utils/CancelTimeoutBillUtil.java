@@ -47,7 +47,9 @@ public class CancelTimeoutBillUtil {
 
             SysSession curSession = timeoutBill.getSysSession();
             if (curSession == null) {
-                throw new DataNotFoundException("场次不存在");
+                // 场次已被删除，跳过该订单
+                System.err.println("超时订单 " + timeoutBill.getBillId() + " 对应的场次不存在，已跳过");
+                return;
             }
             System.out.println(curSession.getSessionSeats());
 

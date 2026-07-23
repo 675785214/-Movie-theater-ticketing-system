@@ -3,6 +3,7 @@ package com.rabbiter.cm.controller;
 import com.rabbiter.cm.common.exception.DataNotFoundException;
 import com.rabbiter.cm.common.response.ResponseResult;
 import com.rabbiter.cm.common.utils.ApplicationContextUtils;
+import com.rabbiter.cm.common.utils.JwtUtil;
 import com.rabbiter.cm.domain.SysBill;
 import com.rabbiter.cm.domain.SysMovie;
 import com.rabbiter.cm.domain.SysSession;
@@ -10,6 +11,7 @@ import com.rabbiter.cm.domain.vo.SysBillVo;
 import com.rabbiter.cm.service.impl.SysBillServiceImpl;
 import com.rabbiter.cm.service.impl.SysMovieServiceImpl;
 import com.rabbiter.cm.service.impl.SysSessionServiceImpl;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,18 @@ public class SysBillController extends BaseController {
 
     @GetMapping("/sysBill")
     public ResponseResult findAllBills(SysBill sysBill) {
+        // 自动根据当前登录用户过滤订单（管理员可看全部）
+        String token = (String) SecurityUtils.getSubject().getPrincipal();
+        if (token != null) {
+            Long roleId = JwtUtil.getRoleId(token);
+            // 非管理员用户，强制只查询自己的订单
+            if (roleId == null || roleId != 1L) {
+                Long userId = JwtUtil.getUserId(token);
+                if (userId != null) {
+                    sysBill.setUserId(userId);
+                }
+            }
+        }
         startPage();
         // 取消所有超时订单并释放占座资源
         ApplicationContextUtils.getBean("cancelTimeoutBill");
