@@ -198,12 +198,9 @@ export default {
                     this.refreshCaptcha();
                     return this.$message.error(res.msg);
                 }
-                if (
-                    res.data.sysUser.sysRole.children === null ||
-                    res.data.sysUser.sysRole.children[0] === null
-                ) {
+                if (res.data.sysUser.sysRole.roleId !== 1) {
                     this.$message.error(
-                        "抱歉，您没有权限登录，请联系管理员获取权限"
+                        "抱歉，仅管理员可登录后台，请使用管理员账号"
                     );
                     return;
                 }
@@ -218,11 +215,7 @@ export default {
                         cinemaName: res.data.cinemaName,
                     })
                 );
-                // window.sessionStorage.setItem("btnPermission", res.data.sysUser.sysRole.roleId === 1 ? "admin" : "normal")
-                window.sessionStorage.setItem(
-                    "btnPermission",
-                    res.data.sysUser.sysRole.roleId === 1 ? "admin" : "admin"
-                );
+                window.sessionStorage.setItem("btnPermission", res.data.sysUser.sysRole.roleId === 1 ? "admin" : "normal")
                 //导航跳转到首页
                 await this.$router.push("/welcome");
             });

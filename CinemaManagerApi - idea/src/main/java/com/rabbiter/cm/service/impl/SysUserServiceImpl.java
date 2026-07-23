@@ -106,7 +106,7 @@ public class SysUserServiceImpl implements SysUserService {
 
         LoginUser loginUser = findLoginUser(sysUserVo);
 
-        String token = JwtUtil.sign(user.getUserName(), user.getPassword());
+        String token = JwtUtil.sign(user.getUserName(), user.getRoleId(), user.getPassword());
         loginUser.setToken(token);
         return loginUser;
     }

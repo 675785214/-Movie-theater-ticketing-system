@@ -74,6 +74,13 @@ router.beforeEach((to, from, next) =>{
     Message.error('抱歉，请先登录')
     return next('/login');
   }
+  //获取角色权限：仅管理员(roleId=1)可访问后台
+  const btnPermission = window.sessionStorage.getItem("btnPermission")
+  if(btnPermission !== 'admin'){
+    Message.error('抱歉，仅管理员可访问后台')
+    window.sessionStorage.clear()
+    return next('/login');
+  }
   next();
 })
 

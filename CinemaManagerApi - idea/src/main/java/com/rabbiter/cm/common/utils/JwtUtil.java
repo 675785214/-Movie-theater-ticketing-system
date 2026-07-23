@@ -59,18 +59,32 @@ public class JwtUtil {
     }
 
     /**
+     * 从token中获取角色ID
+     */
+    public static Long getRoleId(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            return jwt.getClaim("roleId").asLong();
+        } catch (JWTDecodeException e) {
+            return null;
+        }
+    }
+
+    /**
      * 生成token签名EXPIRE_TIME 分钟后过期
      *
      * @param username 用户名
+     * @param roleId   用户角色ID
      * @param secret   用户的密码
      * @return 加密的token
      */
-    public static String sign(String username, String secret) {
+    public static String sign(String username, Long roleId, String secret) {
         Date date = new Date(System.currentTimeMillis() + EXPIRE_TIME);
         Algorithm algorithm = Algorithm.HMAC256(secret);
-        // 附带username信息
+        // 附带username和roleId信息
         return JWT.create()
                 .withClaim("username", username)
+                .withClaim("roleId", roleId)
                 .withExpiresAt(date)
                 .sign(algorithm);
 
@@ -79,9 +93,8 @@ public class JwtUtil {
     public static void main(String[] args) {
         /**
          * 测试生成一个token
-         * 结果：eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDc0ODI5OTYsInVzZXJuYW1lIjoi5ZGo5YWrIn0.UP6kFC0BofuX7FLoPDMWCQno-NhVuYA0NlQG8xgt2Rc
          */
-        String sign = sign("周八", "f93643c0eacc54a5ee1783744466ab9e");
+        String sign = sign("周八", 1L, "f93643c0eacc54a5ee1783744466ab9e");
         log.warn("测试生成一个token\n" + sign);
     }
 

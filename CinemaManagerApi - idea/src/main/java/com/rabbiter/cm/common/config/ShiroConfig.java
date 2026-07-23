@@ -38,8 +38,6 @@ public class ShiroConfig {
         map.put("/captcha", "anon");
         // 放行图片查询
         map.put("/images/**", "anon");
-        // 请求这个资源需要认证与授权
-        map.put("/sysCinema/update", "jwt");
         // 放行影院查询请求
         map.put("/sysCinema/**", "anon");
         // 放行电影查找相关请求
@@ -48,7 +46,12 @@ public class ShiroConfig {
         map.put("/sysMovieCategory/find/**", "anon");
         // 放行电影场次查找相关请求
         map.put("/sysSession/find/**", "anon");
-        // 请求这个资源需要认证与授权
+        // 管理员专属：角色管理和权限管理
+        map.put("/sysRole/**", "jwt, roles[admin]");
+        map.put("/sysResource/**", "jwt, roles[admin]");
+        // 管理员专属：影院信息修改
+        map.put("/sysCinema/update", "jwt, roles[admin]");
+        // 请求这个资源需要认证与授权（其余接口需要有效token）
         map.put("/**", "jwt");
 
         // 添加自己的过滤器并且取名为jwt

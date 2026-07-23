@@ -9,6 +9,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
@@ -38,7 +39,22 @@ public class CustomerRealm extends AuthorizingRealm {
     //授权
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        return null;
+        // 从 Principal 中取出 token，提取角色ID
+        String token = (String) principalCollection.getPrimaryPrincipal();
+        Long roleId = JwtUtil.getRoleId(token);
+
+        if (roleId != null) {
+            SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+            // roleId=1 为系统管理员，其他为普通用户
+            if (roleId == 1L) {
+                info.addRole("admin");
+            } else {
+                info.addRole("user");
+            }
+            return info;
+        }
+        // token 中无 roleId（旧版本 token），返回空授权信息
+        return new SimpleAuthorizationInfo();
     }
 
     //身份认证
