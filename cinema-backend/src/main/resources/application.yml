@@ -7,7 +7,7 @@ spring:
     druid:
       url: ${SPRING_DATASOURCE_DRUID_URL:jdbc:mysql://localhost:3306/cinema_manager?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=Asia/Shanghai}
       username: ${SPRING_DATASOURCE_DRUID_USERNAME:root}
-      password: ${SPRING_DATASOURCE_DRUID_PASSWORD:675785214}
+      password: ${CINEMA_DB_PASSWORD}
       initialSize: 0
       minIdle: 10
       maxActive: 20

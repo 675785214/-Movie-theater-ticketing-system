@@ -7,27 +7,41 @@ echo   Movie Theater Ticketing System Launcher
 echo ============================================
 echo.
 
+REM ---- Load .env ----
+if exist .env (
+    for /f "usebackq tokens=1,2 delims==" %%a in (".env") do set %%a=%%b
+) else (
+    echo [SETUP] First run: creating .env file...
+    set /p CINEMA_DB_PASSWORD="Enter MySQL password: "
+    echo CINEMA_DB_PASSWORD=!CINEMA_DB_PASSWORD! > .env
+    echo   .env created.
+)
+
 REM ---- Check Prerequisites ----
 echo [1/5] Checking environment...
-where java >nul 2>&1 || (echo [ERROR] Java not found & pause & exit /b 1)
-where mvn  >nul 2>&1 || (echo [ERROR] Maven not found & pause & exit /b 1)
-where node >nul 2>&1 || (echo [ERROR] Node.js not found & pause & exit /b 1)
-where npm  >nul 2>&1 || (echo [ERROR] npm not found & pause & exit /b 1)
+where java  >nul 2>&1 || (echo [ERROR] Java not found & pause & exit /b 1)
+where node  >nul 2>&1 || (echo [ERROR] Node.js not found & pause & exit /b 1)
 echo   OK
 
 REM ---- Check MySQL ----
 echo.
 echo [2/5] Checking MySQL...
-mysql -u root -p675785214 -e "SELECT 1" >nul 2>&1
-if %errorlevel% equ 0 (echo   MySQL connected) else (echo   [WARN] MySQL unavailable, continue anyway...)
+mysql -u root -p!CINEMA_DB_PASSWORD! -e "SELECT 1" >nul 2>&1
+if !errorlevel! equ 0 (echo   MySQL connected) else (echo   [WARN] MySQL unavailable, continue anyway...)
 
-REM ---- Build & Start Backend ----
+REM ---- Build and Start Backend ----
 echo.
 echo [3/5] Building and starting backend (port 9231)...
 cd cinema-backend
-call mvn clean compile -DskipTests -q 2>nul
-echo   Backend launching...
-start /B mvn spring-boot:run -q > ..\log-backend.txt 2>&1
+call mvnw clean compile -DskipTests -q
+if !errorlevel! neq 0 (
+    echo [ERROR] Build failed!
+    cd ..
+    pause
+    exit /b 1
+)
+echo   Starting backend...
+start /B mvnw spring-boot:run -q > ..\log-backend.txt 2>&1
 cd ..
 
 REM ---- Start User Frontend ----
@@ -44,13 +58,13 @@ cd admin
 start /B npm run serve > ..\log-admin.txt 2>&1
 cd ..
 
-REM ---- Wait for services to come online ----
+REM ---- Wait for backend ----
 echo.
-echo Waiting for services...
+echo Waiting for backend...
 :wait_backend
 timeout /t 3 /nobreak >nul
 curl -s http://localhost:9231/captcha >nul 2>&1
-if %errorlevel% neq 0 goto wait_backend
+if !errorlevel! neq 0 goto wait_backend
 echo   Backend is ready!
 
 echo.
