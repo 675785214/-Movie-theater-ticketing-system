@@ -51,7 +51,7 @@ if !errorlevel! neq 0 (
     exit /b 1
 )
 echo   Starting backend...
-start /B mvnw.cmd spring-boot:run -q > ..\log-backend.txt 2>&1
+start /B cmd /c "set CINEMA_DB_PASSWORD=!CINEMA_DB_PASSWORD! && mvnw.cmd spring-boot:run -q" > ..\log-backend.txt 2>&1
 cd ..
 
 REM ---- Start User Frontend ----
