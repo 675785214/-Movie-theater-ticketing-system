@@ -8,6 +8,11 @@ echo   Movie Theater Ticketing System Launcher
 echo ============================================
 echo.
 
+REM ---- Resolve directories ----
+if exist "user"                 (set USER_DIR=user)                 else (set USER_DIR=CinemaManagerUserVue)
+if exist "admin"                (set ADMIN_DIR=admin)               else (set ADMIN_DIR=CinemaManagerAdminVue)
+if exist "cinema-backend"       (set BACKEND_DIR=cinema-backend)    else (set BACKEND_DIR=CinemaManagerApi - idea)
+
 REM ---- Load .env ----
 if exist .env (
     for /f "usebackq tokens=1,2 delims==" %%a in (".env") do set %%a=%%b
@@ -20,15 +25,8 @@ if exist .env (
 
 REM ---- Check Prerequisites ----
 echo [1/5] Checking environment...
-where java  >nul 2>&1 || (echo [ERROR] Java not found -- install JDK 17+ & pause & exit /b 1)
-where node  >nul 2>&1 || (echo [ERROR] Node.js not found -- install Node.js & pause & exit /b 1)
-if not defined JAVA_HOME (
-    echo [WARN] JAVA_HOME not set, trying to auto-detect...
-    for /f "tokens=*" %%i in ('where java') do set JAVA_HOME=%%~dpi..
-    if defined JAVA_HOME set JAVA_HOME=!JAVA_HOME!
-    echo   JAVA_HOME=!JAVA_HOME!
-)
-echo   Java: !JAVA_HOME!
+where java  >nul 2>&1 || (echo [ERROR] Java not found & pause & exit /b 1)
+where node  >nul 2>&1 || (echo [ERROR] Node.js not found & pause & exit /b 1)
 echo   OK
 
 REM ---- Check MySQL ----
@@ -40,12 +38,11 @@ if !errorlevel! equ 0 (echo   MySQL connected) else (echo   [WARN] MySQL unavail
 REM ---- Build and Start Backend ----
 echo.
 echo [3/5] Building and starting backend (port 9231)...
-cd cinema-backend
+cd "!BACKEND_DIR!"
 echo   Compiling...
 call mvnw.cmd clean compile -DskipTests
 if !errorlevel! neq 0 (
-    echo.
-    echo [ERROR] Build failed! Check the error above.
+    echo [ERROR] Build failed! See above.
     cd ..
     pause
     exit /b 1
@@ -57,14 +54,14 @@ cd ..
 REM ---- Start User Frontend ----
 echo.
 echo [4/5] Starting user frontend (port 9232)...
-cd user
+cd "!USER_DIR!"
 start /B npm run serve > ..\log-user.txt 2>&1
 cd ..
 
 REM ---- Start Admin Frontend ----
 echo.
 echo [5/5] Starting admin frontend (port 9233)...
-cd admin
+cd "!ADMIN_DIR!"
 start /B npm run serve > ..\log-admin.txt 2>&1
 cd ..
 
@@ -86,8 +83,6 @@ echo   Backend API    : http://localhost:9231
 echo   User Frontend  : http://localhost:9232
 echo   Admin Frontend : http://localhost:9233
 echo.
-echo   Logs: log-backend.txt / log-user.txt / log-admin.txt
-echo.
 echo   Press any key to STOP all services...
 pause >nul
 echo.
@@ -100,5 +95,4 @@ for %%p in (9231 9232 9233) do (
 )
 
 echo All services stopped.
-echo.
 pause
