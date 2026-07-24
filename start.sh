@@ -54,11 +54,9 @@ check_cmd() {
 
 echo -e "${GREEN}[1/5] 检查环境...${NC}"
 check_cmd java
-check_cmd mvn
 check_cmd node
 check_cmd npm
 echo "  Java   : $(java -version 2>&1 | head -1)"
-echo "  Maven  : $(mvn --version 2>&1 | head -1)"
 echo "  Node   : $(node --version)"
 echo "  npm    : $(npm --version)"
 
@@ -67,8 +65,12 @@ echo "  npm    : $(npm --version)"
 ###############################################################################
 echo ""
 echo -e "${GREEN}[2/5] 检查数据库...${NC}"
+if [ -f "$PROJECT_DIR/.env" ]; then
+    export $(grep -v '^#' "$PROJECT_DIR/.env" | xargs)
+fi
+echo -e "${GREEN}[2/5] 检查数据库...${NC}"
 if command -v mysql &>/dev/null; then
-    if mysql -u root -p675785214 -e "SELECT 1" &>/dev/null 2>&1; then
+    if mysql -u root -p"${CINEMA_DB_PASSWORD}" -e "SELECT 1" &>/dev/null 2>&1; then
         echo "  MySQL 连接正常"
     else
         echo -e "${YELLOW}  MySQL 连接失败，尝试继续...${NC}"
@@ -85,10 +87,10 @@ echo -e "${GREEN}[3/5] 编译并启动后端 (端口 9231)...${NC}"
 cd "$BACKEND_DIR"
 
 echo "  正在编译..."
-mvn clean compile -DskipTests -q 2>&1
+./mvnw clean compile -DskipTests
 echo "  编译完成，正在启动 Spring Boot..."
 
-mvn spring-boot:run -q &
+./mvnw spring-boot:run -q &
 PID_BACKEND=$!
 
 # 等待后端就绪

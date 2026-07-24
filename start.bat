@@ -19,8 +19,15 @@ if exist .env (
 
 REM ---- Check Prerequisites ----
 echo [1/5] Checking environment...
-where java  >nul 2>&1 || (echo [ERROR] Java not found & pause & exit /b 1)
-where node  >nul 2>&1 || (echo [ERROR] Node.js not found & pause & exit /b 1)
+where java  >nul 2>&1 || (echo [ERROR] Java not found -- install JDK 17+ & pause & exit /b 1)
+where node  >nul 2>&1 || (echo [ERROR] Node.js not found -- install Node.js & pause & exit /b 1)
+if not defined JAVA_HOME (
+    echo [WARN] JAVA_HOME not set, trying to auto-detect...
+    for /f "tokens=*" %%i in ('where java') do set JAVA_HOME=%%~dpi..
+    if defined JAVA_HOME set JAVA_HOME=!JAVA_HOME!
+    echo   JAVA_HOME=!JAVA_HOME!
+)
+echo   Java: !JAVA_HOME!
 echo   OK
 
 REM ---- Check MySQL ----
@@ -33,15 +40,17 @@ REM ---- Build and Start Backend ----
 echo.
 echo [3/5] Building and starting backend (port 9231)...
 cd cinema-backend
-call mvnw clean compile -DskipTests -q
+echo   Compiling...
+call mvnw.cmd clean compile -DskipTests
 if !errorlevel! neq 0 (
-    echo [ERROR] Build failed!
+    echo.
+    echo [ERROR] Build failed! Check the error above.
     cd ..
     pause
     exit /b 1
 )
 echo   Starting backend...
-start /B mvnw spring-boot:run -q > ..\log-backend.txt 2>&1
+start /B mvnw.cmd spring-boot:run -q > ..\log-backend.txt 2>&1
 cd ..
 
 REM ---- Start User Frontend ----
