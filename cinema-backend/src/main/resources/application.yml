@@ -42,15 +42,9 @@ spring:
       max-file-size: 1024MB
       max-request-size: 1024MB
 
-  # Flyway 数据库版本迁移配置
+  # Flyway 数据库版本迁移（已导出最终 SQL，见 sql/cinema_manager.sql）
   flyway:
-    enabled: true
-    # 已有数据库时开启，Flyway 会以当前状态为基线，只执行后续新脚本
-    baseline-on-migrate: true
-    # 迁移脚本位置
-    locations: classpath:db/migration
-    # 编码
-    encoding: UTF-8
+    enabled: false
 
 mybatis:
   type-aliases-package: com.cinema.**.domain
