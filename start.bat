@@ -39,7 +39,9 @@ REM ---- Build and Start Backend ----
 echo.
 echo [3/5] Building and starting backend (port 9231)...
 cd "!BACKEND_DIR!"
+
 echo   Compiling...
+echo spring.datasource.druid.password=!CINEMA_DB_PASSWORD!> src\main\resources\application.properties
 call mvnw.cmd clean compile -DskipTests
 if !errorlevel! neq 0 (
     echo [ERROR] Build failed! See above.
@@ -48,7 +50,7 @@ if !errorlevel! neq 0 (
     exit /b 1
 )
 echo   Starting backend...
-start /B cmd /c "set CINEMA_DB_PASSWORD=!CINEMA_DB_PASSWORD! && mvnw.cmd spring-boot:run -q" > ..\log-backend.txt 2>&1
+start /B mvnw.cmd spring-boot:run -q > ..\log-backend.txt 2>&1
 cd ..
 
 REM ---- Start User Frontend ----
