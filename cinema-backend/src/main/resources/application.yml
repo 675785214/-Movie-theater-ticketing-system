@@ -1,0 +1,73 @@
+server:
+  port: 9231
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      url: ${SPRING_DATASOURCE_DRUID_URL:jdbc:mysql://localhost:3306/cinema_manager?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=Asia/Shanghai}
+      username: ${SPRING_DATASOURCE_DRUID_USERNAME:root}
+      password: ${SPRING_DATASOURCE_DRUID_PASSWORD:675785214}
+      initialSize: 0
+      minIdle: 10
+      maxActive: 20
+      maxWait: 60000
+      connectTimeout: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      maxEvictableIdleTimeMillis: 900000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+
+  devtools:
+    restart:
+      enabled: true
+  freemarker:
+    cache: false
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  mvc:
+    format:
+      date: yyyy-MM-dd
+      date-time: yyyy-MM-dd HH:mm:ss
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+
+  # Flyway 数据库版本迁移配置
+  flyway:
+    enabled: true
+    # 已有数据库时开启，Flyway 会以当前状态为基线，只执行后续新脚本
+    baseline-on-migrate: true
+    # 迁移脚本位置
+    locations: classpath:db/migration
+    # 编码
+    encoding: UTF-8
+
+mybatis:
+  type-aliases-package: com.cinema.**.domain
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.rabbiter: trace
+    org.springframework: warn
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+app:
+  upload-path: ${APP_UPLOAD_PATH:}

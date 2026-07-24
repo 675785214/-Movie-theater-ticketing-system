@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.mapper.SysBillMapper">
+
+    <resultMap id="BillMap" type="SysBill">
+        <id property="billId" column="bill_id"></id>
+        <result property="userId" column="user_id"></result>
+        <result property="sessionId" column="session_id"></result>
+        <association property="sysSession" column="session_id" select="com.cinema.mapper.SysSessionMapper.findSessionById"></association>
+        <association property="sysUser" column="user_id" select="com.cinema.mapper.SysUserMapper.findUserById"></association>
+    </resultMap>
+
+    <!-- 优化版：JOIN 查询，一条 SQL 替代 N+1 次子查询（含影院） -->
+    <resultMap id="BillJoinMap" type="SysBill">
+        <id property="billId" column="bill_id"></id>
+        <result property="userId" column="user_id"></result>
+        <result property="sessionId" column="session_id"></result>
+        <result property="payState" column="pay_state"></result>
+        <result property="cancelState" column="cancel_state"></result>
+        <result property="seats" column="seats"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="deadline" column="deadline"></result>
+        <result property="cancelTime" column="cancel_time"></result>
+        <association property="sysSession" javaType="SysSession">
+            <id property="sessionId" column="session_id"></id>
+            <result property="hallId" column="hall_id"></result>
+            <result property="movieId" column="movie_id"></result>
+            <result property="sessionDate" column="session_date"></result>
+            <result property="sessionPrice" column="session_price"></result>
+            <result property="playTime" column="play_time"></result>
+            <result property="endTime" column="end_time"></result>
+            <result property="sessionSeats" column="session_seats"></result>
+            <result property="sessionTips" column="session_tips"></result>
+            <association property="sysHall" javaType="SysHall">
+                <id property="hallId" column="hall_id"></id>
+                <result property="hallName" column="hall_name"></result>
+                <result property="hallCategory" column="hall_category"></result>
+                <result property="cinemaId" column="cinema_id"></result>
+                <association property="sysCinema" javaType="SysCinema">
+                    <id property="cinemaId" column="cinema_id"></id>
+                    <result property="cinemaName" column="cinema_name"></result>
+                </association>
+            </association>
+            <association property="sysMovie" javaType="SysMovie">
+                <id property="movieId" column="movie_id"></id>
+                <result property="movieName" column="movie_name"></result>
+                <result property="movieLength" column="movie_length"></result>
+                <result property="moviePoster" column="movie_poster"></result>
+            </association>
+        </association>
+        <association property="sysUser" javaType="SysUser">
+            <id property="userId" column="user_id"></id>
+            <result property="userName" column="user_name"></result>
+            <result property="email" column="email"></result>
+            <result property="phoneNumber" column="phone_number"></result>
+        </association>
+    </resultMap>
+
+    <select id="findAllBills" parameterType="SysBill" resultMap="BillMap">
+        select * from sys_bill
+        <where>
+            <if test="payState != null"> and pay_state = #{payState} </if>
+            <if test="sessionId != null and sessionId !=''"> and session_id = #{sessionId} </if>
+            <if test="queryByUserName != null and queryByUserName != ''">
+                and user_id in
+                (select user_id
+                 from sys_user
+                 where user_name like concat('%', #{queryByUserName}, '%'))
+            </if>
+            <if test="userId != null"> and user_id = #{userId} </if>
+            <if test="createTime != null"> and create_time &gt;= #{createTime} and create_time &lt;= adddate(#{createTime}, 1) </if>
+        </where>
+        order by bill_id desc
+    </select>
+
+    <!-- 优化版：一次性 JOIN 查询订单+场次+影厅+电影+影院+用户，消除 N+1 -->
+    <select id="findAllBillsJoin" parameterType="SysBill" resultMap="BillJoinMap">
+        SELECT b.*,
+               s.hall_id, s.movie_id, s.session_date, s.session_price,
+               s.play_time, s.end_time,
+               s.session_seats, s.session_tips,
+               h.hall_name, h.hall_category, h.cinema_id,
+               m.movie_name, m.movie_length, m.movie_poster,
+               c.cinema_name,
+               u.user_name, u.email, u.phone_number
+        FROM sys_bill b
+        JOIN sys_session s ON b.session_id = s.session_id
+        JOIN sys_hall h ON s.hall_id = h.hall_id
+        JOIN sys_movie m ON s.movie_id = m.movie_id
+        JOIN sys_cinema c ON h.cinema_id = c.cinema_id
+        JOIN sys_user u ON b.user_id = u.user_id
+        <where>
+            <if test="payState != null"> and b.pay_state = #{payState} </if>
+            <if test="sessionId != null and sessionId !=''"> and b.session_id = #{sessionId} </if>
+            <if test="queryByUserName != null and queryByUserName != ''">
+                and u.user_name like concat('%', #{queryByUserName}, '%')
+            </if>
+            <if test="userId != null"> and b.user_id = #{userId} </if>
+            <if test="createTime != null"> and b.create_time &gt;= #{createTime} and b.create_time &lt;= adddate(#{createTime}, 1) </if>
+        </where>
+        order by b.bill_id desc
+    </select>
+
+    <select id="findBillById" parameterType="long" resultMap="BillMap">
+        select * from sys_bill where bill_id = #{id}
+    </select>
+
+    <select id="findTimeoutBill" resultMap="BillMap">
+        select * from sys_bill where sysdate() >= deadline and cancel_state = 0 and pay_state = 0
+    </select>
+
+    <update id="addBill" parameterType="SysBill">
+        <!-- 将添加后的主键id传回原对象 -->
+        <selectKey keyProperty="billId" keyColumn="bill_id" resultType="long" order="AFTER">
+            select last_insert_id();
+        </selectKey>
+        insert into sys_bill (
+            <if test="payState != null">pay_state, </if>
+            user_id, session_id, seats, create_time, deadline
+        ) values (
+            <if test="payState != null">#{payState}, </if>
+            #{userId}, #{sessionId}, #{seats},
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createTime == null">sysdate(),</if>
+            addtime(sysdate(), 15*100)
+        )
+    </update>
+
+    <update id="updateBill" parameterType="SysBill">
+        update sys_bill set
+        <if test="payState != null">pay_state = #{payState}, </if>
+        <if test="cancelState != null">cancel_state = #{cancelState}, </if>
+        <if test="payState != null">pay_state = #{payState}, </if>
+        <if test="seats != null and seats != ''">seats = #{seats}, </if>
+        <if test="cancelTime != null ">cancel_time = #{cancelTime}, </if>
+        create_time = sysdate()
+        where bill_id = #{billId}
+    </update>
+
+    <update id="deleteBill" parameterType="long">
+        delete from sys_bill where bill_id = #{id}
+    </update>
+
+</mapper>

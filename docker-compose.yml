@@ -22,7 +22,7 @@ services:
 
   backend:
     build:
-      context: "CinemaManagerApi - idea"
+      context: ./cinema-backend
       dockerfile: ../Dockerfile.backend
     container_name: cinema-backend
     restart: unless-stopped
@@ -43,7 +43,7 @@ services:
 
   admin-frontend:
     build:
-      context: ./CinemaManagerAdminVue
+      context: ./admin
       dockerfile: ../Dockerfile.admin
     container_name: cinema-admin
     restart: unless-stopped
@@ -56,7 +56,7 @@ services:
 
   user-frontend:
     build:
-      context: ./CinemaManagerUserVue
+      context: ./user
       dockerfile: ../Dockerfile.user
     container_name: cinema-user
     restart: unless-stopped

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cinema.mapper.SysSessionMapper">
+
+    <resultMap id="SysSessionResult" type="SysSession">
+        <id property="sessionId" column="session_id"></id>
+        <result property="hallId" column="hall_id"></result>
+        <result property="movieId" column="movie_id"></result>
+        <result property="languageVersion" column="language_version"></result>
+        <result property="playTime" column="play_time"></result>
+        <result property="endTime" column="end_time"></result>
+        <result property="sessionDate" column="session_date"></result>
+        <result property="sessionPrice" column="session_price"></result>
+        <result property="sessionSeats" column="session_seats"></result>
+        <result property="sessionTips" column="session_tips"></result>
+        <result property="seatNums" column="seat_nums"></result>
+        <association property="sysHall" column="hallId=hall_id" select="com.cinema.mapper.SysHallMapper.findHallById"></association>
+        <association property="sysMovie" column="movie_id" select="com.cinema.mapper.SysMovieMapper.findMovieById"></association>
+    </resultMap>
+
+    <resultMap id="SysSessionMap" type="SysSession">
+        <id property="sessionId" column="session_id"></id>
+        <result property="hallId" column="hall_id"></result>
+        <result property="languageVersion" column="language_version"></result>
+        <result property="movieId" column="movie_id"></result>
+        <result property="playTime" column="play_time"></result>
+        <result property="endTime" column="end_time"></result>
+        <result property="sessionDate" column="session_date"></result>
+        <result property="sessionPrice" column="session_price"></result>
+        <result property="sessionSeats" column="session_seats"></result>
+        <result property="sessionTips" column="session_tips"></result>
+        <result property="seatNums" column="seat_nums"></result>
+        <association property="sysHall">
+            <result property="hallId" column="hall_id"></result>
+            <result property="hallName" column="hall_name"></result>
+            <result property="rowStart" column="row_start"></result>
+            <result property="rowNums" column="row_nums"></result>
+            <result property="seatNumsRow" column="seat_nums_row"></result>
+            <result property="seatNums" column="seat_nums"></result>
+            <result property="seatState" column="seat_state"></result>
+        </association>
+    </resultMap>
+
+    <select id="findByVo" parameterType="SysSessionVo" resultMap="SysSessionResult">
+        select * from sys_session se
+        <where>
+            se.del_state = 0
+            <if test="hallId != null and hallId != 0">
+                and se.hall_id = #{hallId}
+            </if>
+            <if test="movieId != null and movieId != 0">
+                and se.movie_id = #{movieId}
+            </if>
+            <if test="sessionDate != null">
+                and se.session_date = #{sessionDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 优化版：JOIN 查询场次+影厅+电影，消除 N+1 -->
+    <resultMap id="SysSessionJoinMap" type="SysSession">
+        <id property="sessionId" column="session_id"></id>
+        <result property="hallId" column="hall_id"></result>
+        <result property="languageVersion" column="language_version"></result>
+        <result property="movieId" column="movie_id"></result>
+        <result property="playTime" column="play_time"></result>
+        <result property="endTime" column="end_time"></result>
+        <result property="sessionDate" column="session_date"></result>
+        <result property="sessionPrice" column="session_price"></result>
+        <result property="sessionSeats" column="session_seats"></result>
+        <result property="sessionTips" column="session_tips"></result>
+        <result property="seatNums" column="seat_nums"></result>
+        <result property="sallNums" column="sall_nums"></result>
+        <association property="sysHall" javaType="SysHall">
+            <id property="hallId" column="hall_id"></id>
+            <result property="hallName" column="hall_name"></result>
+            <result property="hallCategory" column="hall_category"></result>
+            <result property="rowStart" column="row_start"></result>
+            <result property="rowNums" column="row_nums"></result>
+            <result property="seatNumsRow" column="seat_nums_row"></result>
+            <result property="seatNums" column="seat_nums"></result>
+            <result property="seatState" column="seat_state"></result>
+        </association>
+        <association property="sysMovie" javaType="SysMovie">
+            <id property="movieId" column="movie_id"></id>
+            <result property="movieName" column="movie_name"></result>
+            <result property="movieLength" column="movie_length"></result>
+            <result property="movieArea" column="movie_area"></result>
+        </association>
+    </resultMap>
+
+    <select id="findByVoJoin" parameterType="SysSessionVo" resultMap="SysSessionJoinMap">
+        SELECT se.*,
+               sh.hall_name, sh.hall_category, sh.row_start, sh.row_nums,
+               sh.seat_nums_row, sh.seat_nums AS sh_seat_nums, sh.seat_state,
+               sm.movie_name, sm.movie_length, sm.movie_area
+        FROM sys_session se
+        JOIN sys_hall sh ON se.hall_id = sh.hall_id
+        JOIN sys_movie sm ON se.movie_id = sm.movie_id
+        <where>
+            se.del_state = 0
+            <if test="hallId != null and hallId != 0">
+                and se.hall_id = #{hallId}
+            </if>
+            <if test="movieId != null and movieId != 0">
+                and se.movie_id = #{movieId}
+            </if>
+            <if test="sessionDate != null">
+                and se.session_date = #{sessionDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="findSessionByMovieIdOrHallId" parameterType="SysSession" resultMap="SysSessionMap">
+        select * from sys_session
+        <where>
+            del_state = 0 and deadline &gt; SYSDATE()
+            <if test="hallId != null and hallId != 0">and hall_id = #{hallId} </if>
+            <if test="movieId != null and movieId != 0">and movie_id = #{movieId} </if>
+        </where>
+    </select>
+
+    <select id="findSessionById" parameterType="long" resultMap="SysSessionResult">
+        select * from sys_session where session_id = #{id}
+    </select>
+
+    <select id="findOneSession" parameterType="long" resultType="SysSession">
+        select * from sys_session where session_id = #{id}
+    </select>
+
+    <update id="addSession" parameterType="SysSession">
+        insert into sys_session(
+            hall_id, language_version, movie_id, play_time, end_time, deadline, session_date, session_price,
+            <if test="sessionTips != null and sessionTips != ''">session_tips, </if>
+            session_seats, seat_nums
+        ) values(
+            #{hallId}, #{languageVersion}, #{movieId}, #{playTime}, #{endTime}, #{deadline}, #{sessionDate}, #{sessionPrice},
+            <if test="sessionTips != null and sessionTips != ''">#{sessionTips}, </if>
+            #{sessionSeats}, #{seatNums}
+        )
+    </update>
+
+    <update id="updateSession" parameterType="SysSession">
+        update sys_session
+        set
+        <if test="hallId != null and hallId != 0">hall_id = #{hallId},</if>
+        <if test="languageVersion != null and languageVersion != ''">language_version = #{languageVersion},</if>
+        <if test="movieId != null and movieId != 0">movie_id = #{movieId},</if>
+        <if test="playTime != null">play_time = #{playTime},</if>
+        <if test="endTime != null">end_time = #{endTime},</if>
+        <if test="deadline != null">deadline = #{deadline},</if>
+        <if test="sessionDate != null">session_date = #{sessionDate},</if>
+        <if test="sessionPrice != null and sessionPrice >= 0">session_price = #{sessionPrice},</if>
+        <if test="sessionTips != null and sessionTips != ''">session_tips = #{sessionTips},</if>
+        <if test="sallNums != null and sallNums != ''">sall_nums = #{sallNums},</if>
+        session_seats = #{sessionSeats}, seat_nums = #{seatNums}
+        where session_id = #{sessionId}
+    </update>
+
+    <update id="deleteSession" parameterType="long">
+        update sys_session set del_state = 1 where session_id = #{sessionId}
+    </update>
+
+    <select id="findSessionByMovieId" resultMap="SysSessionMap">
+        select ss.*, sh.* from sys_movie sm
+        join sys_session ss on sm.movie_id = ss.movie_id
+        join sys_hall sh on ss.hall_id = sh.hall_id
+        where sm.movie_id = #{movieId} and ss.session_date &gt;= CURDATE()
+        order by session_date
+    </select>
+
+</mapper>

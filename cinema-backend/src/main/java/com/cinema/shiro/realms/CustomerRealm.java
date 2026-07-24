@@ -1,0 +1,88 @@
+package com.cinema.shiro.realms;
+
+import com.cinema.common.utils.JwtUtil;
+import com.cinema.domain.SysUser;
+import com.cinema.service.impl.SysUserServiceImpl;
+import com.cinema.shiro.JwtToken;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 自定义realm
+ */
+public class CustomerRealm extends AuthorizingRealm {
+     Logger log = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private SysUserServiceImpl sysUserService;
+
+    /**
+     * 重写此方法避免shiro报错
+     *
+     * @param token
+     * @return
+     */
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof JwtToken;
+    }
+
+    //授权
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+        // 从 Principal 中取出 token，提取角色ID
+        String token = (String) principalCollection.getPrimaryPrincipal();
+        Long roleId = JwtUtil.getRoleId(token);
+
+        if (roleId != null) {
+            SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+            // roleId=1 为系统管理员，其他为普通用户
+            if (roleId == 1L) {
+                info.addRole("admin");
+            } else {
+                info.addRole("user");
+            }
+            return info;
+        }
+        // token 中无 roleId（旧版本 token），返回空授权信息
+        return new SimpleAuthorizationInfo();
+    }
+
+    //身份认证
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        String token = (String) authenticationToken.getCredentials();
+        // 解密获得username，用于和数据库进行对比
+        String username = null;
+        try {
+            //这里工具类没有处理空指针等异常这里处理一下(这里处理科学一些)
+            username = JwtUtil.getUsername(token);
+        } catch (Exception e) {
+            throw new AuthenticationException("token拼写错误或者值为空");
+        }
+        if (username == null) {
+            log.error("token无效(空''或者null都不行!)");
+            throw new AuthenticationException("token无效");
+        }
+        SysUser user = sysUserService.findUserByName(username);
+        if (user == null) {
+            log.error("用户不存在)");
+            throw new AuthenticationException("用户不存在");
+        }
+        if (!JwtUtil.verify(token, username, user.getPassword())) {
+            log.error("用户名或密码错误(token无效或者与登录者不匹配)");
+            throw new AuthenticationException("用户名或密码错误(token无效或者与登录者不匹配)");
+        }
+        return new SimpleAuthenticationInfo(token, token, this.getName());
+    }
+
+}
