@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 title Cinema Manager
 cd /d "%~dp0"
 

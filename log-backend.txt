@@ -10,24 +10,24 @@ Project Path: D:/code/Movie theater ticketing system/cinema-backend
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v2.4.0)
 
-2026-07-24 11:13:41.987  INFO 19712 --- [kground-preinit] o.h.validator.internal.util.Version      : HV000001: Hibernate Validator 6.1.6.Final
-2026-07-24 11:13:41.994  INFO 19712 --- [  restartedMain] com.cinema.CinemaManagerApplication      : Starting CinemaManagerApplication using Java 17.0.19 on Elysia with PID 19712 (D:\code\Movie theater ticketing system\cinema-backend\target\classes started by 86185 in D:\code\Movie theater ticketing system\cinema-backend)
-2026-07-24 11:13:41.994  INFO 19712 --- [  restartedMain] com.cinema.CinemaManagerApplication      : No active profile set, falling back to default profiles: default
-2026-07-24 11:13:42.699  WARN 19712 --- [  restartedMain] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.rabbiter.sms.dao]' package. Please check your configuration.
-2026-07-24 11:13:43.448  INFO 19712 --- [  restartedMain] o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-9231"]
-2026-07-24 11:13:43.449  INFO 19712 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-07-24 11:13:43.449  INFO 19712 --- [  restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.39]
-2026-07-24 11:13:43.450  INFO 19712 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [1.3.1] using APR version [1.7.4].
-2026-07-24 11:13:43.451  INFO 19712 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
-2026-07-24 11:13:43.451  INFO 19712 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
-2026-07-24 11:13:43.454  INFO 19712 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
-2026-07-24 11:13:43.565  INFO 19712 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-07-24 11:13:43.752  INFO 19712 --- [  restartedMain] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
-2026-07-24 11:13:44.328  INFO 19712 --- [  restartedMain] org.quartz.impl.StdSchedulerFactory      : Using default implementation for ThreadExecutor
-2026-07-24 11:13:44.337  INFO 19712 --- [  restartedMain] org.quartz.core.SchedulerSignalerImpl    : Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
-2026-07-24 11:13:44.337  INFO 19712 --- [  restartedMain] org.quartz.core.QuartzScheduler          : Quartz Scheduler v.2.3.2 created.
-2026-07-24 11:13:44.338  INFO 19712 --- [  restartedMain] org.quartz.simpl.RAMJobStore             : RAMJobStore initialized.
-2026-07-24 11:13:44.338  INFO 19712 --- [  restartedMain] org.quartz.core.QuartzScheduler          : Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+2026-07-24 11:36:47.159  INFO 22368 --- [kground-preinit] o.h.validator.internal.util.Version      : HV000001: Hibernate Validator 6.1.6.Final
+2026-07-24 11:36:47.164  INFO 22368 --- [  restartedMain] com.cinema.CinemaManagerApplication      : Starting CinemaManagerApplication using Java 17.0.19 on Elysia with PID 22368 (D:\code\Movie theater ticketing system\cinema-backend\target\classes started by 86185 in D:\code\Movie theater ticketing system\cinema-backend)
+2026-07-24 11:36:47.165  INFO 22368 --- [  restartedMain] com.cinema.CinemaManagerApplication      : No active profile set, falling back to default profiles: default
+2026-07-24 11:36:47.949  WARN 22368 --- [  restartedMain] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.rabbiter.sms.dao]' package. Please check your configuration.
+2026-07-24 11:36:48.831  INFO 22368 --- [  restartedMain] o.a.coyote.http11.Http11NioProtocol      : Initializing ProtocolHandler ["http-nio-9231"]
+2026-07-24 11:36:48.831  INFO 22368 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-07-24 11:36:48.832  INFO 22368 --- [  restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.39]
+2026-07-24 11:36:48.833  INFO 22368 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : Loaded Apache Tomcat Native library [1.3.1] using APR version [1.7.4].
+2026-07-24 11:36:48.834  INFO 22368 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2026-07-24 11:36:48.834  INFO 22368 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2026-07-24 11:36:48.838  INFO 22368 --- [  restartedMain] o.a.catalina.core.AprLifecycleListener   : OpenSSL successfully initialized [OpenSSL 3.0.14 4 Jun 2024]
+2026-07-24 11:36:48.946  INFO 22368 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-07-24 11:36:49.152  INFO 22368 --- [  restartedMain] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+2026-07-24 11:36:49.695  INFO 22368 --- [  restartedMain] org.quartz.impl.StdSchedulerFactory      : Using default implementation for ThreadExecutor
+2026-07-24 11:36:49.706  INFO 22368 --- [  restartedMain] org.quartz.core.SchedulerSignalerImpl    : Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2026-07-24 11:36:49.706  INFO 22368 --- [  restartedMain] org.quartz.core.QuartzScheduler          : Quartz Scheduler v.2.3.2 created.
+2026-07-24 11:36:49.707  INFO 22368 --- [  restartedMain] org.quartz.simpl.RAMJobStore             : RAMJobStore initialized.
+2026-07-24 11:36:49.708  INFO 22368 --- [  restartedMain] org.quartz.core.QuartzScheduler          : Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
   Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
   NOT STARTED.
   Currently in standby mode.
@@ -35,14 +35,14 @@ Project Path: D:/code/Movie theater ticketing system/cinema-backend
   Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
   Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
 
-2026-07-24 11:13:44.338  INFO 19712 --- [  restartedMain] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
-2026-07-24 11:13:44.338  INFO 19712 --- [  restartedMain] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler version: 2.3.2
-2026-07-24 11:13:44.339  INFO 19712 --- [  restartedMain] org.quartz.core.QuartzScheduler          : JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@6cb7c77b
-2026-07-24 11:13:44.379  INFO 19712 --- [  restartedMain] o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-9231"]
-2026-07-24 11:13:44.403  INFO 19712 --- [  restartedMain] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED started.
-执行取消超时订单处理2026-07-24 11:13:44
-2026-07-24 11:13:44.410  INFO 19712 --- [  restartedMain] com.cinema.CinemaManagerApplication      : Started CinemaManagerApplication in 2.83 seconds (JVM running for 3.33)
-2026-07-24 11:13:44.469  INFO 19712 --- [nio-9231-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-24 11:36:49.708  INFO 22368 --- [  restartedMain] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2026-07-24 11:36:49.708  INFO 22368 --- [  restartedMain] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler version: 2.3.2
+2026-07-24 11:36:49.708  INFO 22368 --- [  restartedMain] org.quartz.core.QuartzScheduler          : JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@67905fb3
+2026-07-24 11:36:49.744  INFO 22368 --- [  restartedMain] o.a.coyote.http11.Http11NioProtocol      : Starting ProtocolHandler ["http-nio-9231"]
+2026-07-24 11:36:49.766  INFO 22368 --- [  restartedMain] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED started.
+执行取消超时订单处理2026-07-24 11:36:49
+2026-07-24 11:36:49.771  INFO 22368 --- [  restartedMain] com.cinema.CinemaManagerApplication      : Started CinemaManagerApplication in 3.033 seconds (JVM running for 3.525)
+2026-07-24 11:36:51.235  INFO 22368 --- [nio-9231-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 [ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:2.4.0:run (default-cli) on project CinemaManagerApi: Application finished with exit code: -1073741510 -> [Help 1]
 [ERROR] 
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
@@ -50,5 +50,3 @@ Project Path: D:/code/Movie theater ticketing system/cinema-backend
 [ERROR] 
 [ERROR] For more information about the errors and possible solutions, please read the following articles:
 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-
-D:\code\Movie theater ticketing system\cinema-backend>
