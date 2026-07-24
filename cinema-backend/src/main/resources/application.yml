@@ -42,10 +42,6 @@ spring:
       max-file-size: 1024MB
       max-request-size: 1024MB
 
-  # Flyway 数据库版本迁移（已导出最终 SQL，见 sql/cinema_manager.sql）
-  flyway:
-    enabled: false
-
 mybatis:
   type-aliases-package: com.cinema.**.domain
   mapper-locations: classpath*:mapper/**/*Mapper.xml
