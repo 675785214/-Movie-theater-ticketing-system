@@ -23,7 +23,7 @@ spring:
 
   devtools:
     restart:
-      enabled: true
+      enabled: false
   freemarker:
     cache: false
 
